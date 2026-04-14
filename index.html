@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ST-OS | SpeedTehnology</title>
+    <!-- ЛИЦО СИСТЕМЫ -->
+    <link rel="icon" type="image/png" href="icom.png">
+    
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; height: 100vh; color: white; }
+        
+        /* РАБОЧИЙ СТОЛ С ТВОИМИ ОБОЯМИ */
+        #desktop { 
+            width: 100%; 
+            height: 100%; 
+            background: url('Wallaper.jpg') center/cover no-repeat; 
+            display: flex; 
+            position: relative; 
+        }
+
+        /* ИКОНКА SpeedChat (Двойной клик) */
+        .icon-app {
+            width: 90px;
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 20px;
+            transition: 0.2s;
+            user-select: none;
+            border: 1px solid transparent;
+        }
+        .icon-app:hover { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; }
+        .icon-app img { width: 55px; filter: drop-shadow(0 0 10px rgba(82, 136, 193, 0.8)); }
+        .icon-app span { font-size: 12px; margin-top: 8px; text-shadow: 2px 2px 4px black; text-align: center; font-weight: bold; }
+
+        /* ОКНО МЕССЕНДЖЕРА */
+        #window-chat {
+            position: absolute;
+            top: 10%; left: 5%;
+            width: 90%; height: 80%;
+            background: #0e1621;
+            border: 1px solid #17212b;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+            display: none; /* Скрыто до 2-го клика */
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            transition: width 0.3s, height 0.3s, top 0.3s, left 0.3s;
+        }
+
+        .win-header {
+            background: #17212b;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+
+        .win-controls { display: flex; gap: 8px; }
+        .win-btn { width: 14px; height: 14px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: white; }
+        .btn-close { background: #ff4d4d; }
+        .btn-max { background: #febc2e; }
+
+        /* ФРЕЙМ С МЕССЕНДЖЕРОМ */
+        .app-content { flex: 1; width: 100%; border: none; background: #0e1621; }
+
+        /* ПАНЕЛЬ ЗАДАЧ */
+        #taskbar {
+            position: absolute; bottom: 0; width: 100%; height: 45px;
+            background: rgba(23, 33, 43, 0.8);
+            backdrop-filter: blur(12px);
+            display: flex; align-items: center; padding: 0 15px;
+            z-index: 2000;
+            box-sizing: border-box;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .start-icon { width: 32px; height: 32px; cursor: pointer; transition: 0.3s; }
+        .start-icon:hover { transform: rotate(15deg); }
+        .clock { margin-left: auto; font-size: 13px; font-weight: bold; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+<div id="desktop">
+    <!-- ИКОНКА С ДВОЙНЫМ КЛИКОМ -->
+    <div class="icon-app" ondblclick="openChat()">
+        <img src="icom.png">
+        <span>SpeedChat<br>Messenger</span>
+    </div>
+
+    <!-- ОКНО SPEEDCHAT -->
+    <div id="window-chat">
+        <div class="win-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <img src="icom.png" width="18">
+                <span style="font-size:12px; font-weight:bold; letter-spacing: 0.5px;">ST-OS: SpeedChat Online</span>
+            </div>
+            <div class="win-controls">
+                <button class="win-btn btn-max" onclick="toggleFull()">□</button>
+                <button class="win-btn btn-close" onclick="closeChat()">×</button>
+            </div>
+        </div>
+        
+        <!-- ТВОЙ МЕССЕНДЖЕР ИЗ ПЕРВОГО РЕПОЗИТОРИЯ -->
+        <iframe id="chat-frame" class="app-content" src="https://nktm068-sudo.github.io/SpeedChat/?"></iframe>
+    </div>
+
+    <!-- ПАНЕЛЬ ЗАДАЧ -->
+    <div id="taskbar">
+        <img src="icom.png" class="start-icon" title="Пуск ST-OS">
+        <div style="margin-left: 20px; font-size: 10px; color: #5288c1; opacity: 0.8;">Powered by SpeedTehnology (ST)</div>
+        <div class="clock" id="clock">00:00</div>
+    </div>
+</div>
+
+<script>
+    // УПРАВЛЕНИЕ ОКНОМ
+    function openChat() {
+        let win = document.getElementById('window-chat');
+        win.style.display = 'flex';
+        // Перезагружаем фрейм, чтобы чат обновился
+        document.getElementById('chat-frame').src = document.getElementById('chat-frame').src;
+    }
+
+    function closeChat() {
+        document.getElementById('window-chat').style.display = 'none';
+    }
+
+    function toggleFull() {
+        let win = document.getElementById('window-chat');
+        if(win.style.width === "100%") {
+            win.style.width = "90%"; win.style.height = "80%"; win.style.top = "10%"; win.style.left = "5%";
+        } else {
+            win.style.width = "100%"; win.style.height = "100%"; win.style.top = "0"; win.style.left = "0";
+        }
+    }
+
+    // ЧАСЫ (Реальное время)
+    function updateClock() {
+        let now = new Date();
+        let h = now.getHours();
+        let m = now.getMinutes();
+        if(m < 10) m = '0' + m;
+        document.getElementById('clock').innerText = h + ":" + m;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
+</body>
+</html>
