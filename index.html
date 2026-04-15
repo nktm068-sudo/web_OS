@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ST-OS | SpeedTehnology</title>
-    <!-- ЛИЦО СИСТЕМЫ -->
     <link rel="icon" type="image/png" href="icom.png">
     
     <style>
@@ -19,7 +18,7 @@
             position: relative; 
         }
 
-        /* ИКОНКА SpeedChat (Двойной клик) */
+        /* ОБЩИЙ СТИЛЬ ДЛЯ ИКОНОК */
         .icon-app {
             width: 90px;
             height: 110px;
@@ -28,25 +27,23 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            margin: 20px;
+            position: absolute;
             transition: 0.2s;
             user-select: none;
             border: 1px solid transparent;
         }
         .icon-app:hover { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; }
         .icon-app img { width: 55px; filter: drop-shadow(0 0 10px rgba(82, 136, 193, 0.8)); }
-        .icon-app span { font-size: 12px; margin-top: 8px; text-shadow: 2px 2px 4px black; text-align: center; font-weight: bold; }
+        .icon-app span { font-size: 11px; margin-top: 8px; text-shadow: 2px 2px 4px black; text-align: center; font-weight: bold; }
 
-        /* ОКНО МЕССЕНДЖЕРА */
-        #window-chat {
+        /* ОКНА (ОБЩИЙ СТИЛЬ) */
+        .window {
             position: absolute;
-            top: 10%; left: 5%;
-            width: 90%; height: 80%;
             background: #0e1621;
             border: 1px solid #17212b;
             border-radius: 12px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.9);
-            display: none; /* Скрыто до 2-го клика */
+            display: none;
             flex-direction: column;
             z-index: 1000;
             overflow: hidden;
@@ -59,7 +56,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: move;
         }
 
         .win-controls { display: flex; gap: 8px; }
@@ -67,7 +63,6 @@
         .btn-close { background: #ff4d4d; }
         .btn-max { background: #febc2e; }
 
-        /* ФРЕЙМ С МЕССЕНДЖЕРОМ */
         .app-content { flex: 1; width: 100%; border: none; background: #0e1621; }
 
         /* ПАНЕЛЬ ЗАДАЧ */
@@ -81,34 +76,52 @@
             border-top: 1px solid rgba(255,255,255,0.1);
         }
         .start-icon { width: 32px; height: 32px; cursor: pointer; transition: 0.3s; }
-        .start-icon:hover { transform: rotate(15deg); }
         .clock { margin-left: auto; font-size: 13px; font-weight: bold; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
 <div id="desktop">
-    <!-- ИКОНКА С ДВОЙНЫМ КЛИКОМ -->
-    <div class="icon-app" ondblclick="openChat()">
+    <!-- ИКОНКА SpeedChat -->
+    <div class="icon-app" style="top: 20px; left: 20px;" ondblclick="openApp('window-chat')">
         <img src="icom.png">
         <span>SpeedChat<br>Messenger</span>
     </div>
 
+    <!-- ИКОНКА Google (НОВАЯ!) -->
+    <div class="icon-app" style="top: 20px; left: 130px;" ondblclick="openApp('window-google')">
+        <img src="Google.png">
+        <span>Google<br>Search</span>
+    </div>
+
     <!-- ОКНО SPEEDCHAT -->
-    <div id="window-chat">
+    <div id="window-chat" class="window" style="top: 10%; left: 5%; width: 85%; height: 75%;">
         <div class="win-header">
             <div style="display:flex; align-items:center; gap:8px;">
                 <img src="icom.png" width="18">
-                <span style="font-size:12px; font-weight:bold; letter-spacing: 0.5px;">ST-OS: SpeedChat Online</span>
+                <span style="font-size:12px; font-weight:bold;">ST-OS: SpeedChat</span>
             </div>
             <div class="win-controls">
-                <button class="win-btn btn-max" onclick="toggleFull()">□</button>
-                <button class="win-btn btn-close" onclick="closeChat()">×</button>
+                <button class="win-btn btn-max" onclick="toggleFull('window-chat')">□</button>
+                <button class="win-btn btn-close" onclick="closeApp('window-chat')">×</button>
             </div>
         </div>
-        
-        <!-- ТВОЙ МЕССЕНДЖЕР ИЗ ПЕРВОГО РЕПОЗИТОРИЯ -->
         <iframe id="chat-frame" class="app-content" src="https://nktm068-sudo.github.io/SpeedChat/?"></iframe>
+    </div>
+
+    <!-- ОКНО GOOGLE (ДРУГОЕ ОКНО!) -->
+    <div id="window-google" class="window" style="top: 15%; left: 10%; width: 80%; height: 70%; background: white;">
+        <div class="win-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <img src="Google.png" width="18">
+                <span style="font-size:12px; font-weight:bold; color: white;">ST-OS: Google Search</span>
+            </div>
+            <div class="win-controls">
+                <button class="win-btn btn-max" onclick="toggleFull('window-google')">□</button>
+                <button class="win-btn btn-close" onclick="closeApp('window-google')">×</button>
+            </div>
+        </div>
+        <iframe class="app-content" src="https://google.com"></iframe>
     </div>
 
     <!-- ПАНЕЛЬ ЗАДАЧ -->
@@ -120,28 +133,31 @@
 </div>
 
 <script>
-    // УПРАВЛЕНИЕ ОКНОМ
-    function openChat() {
-        let win = document.getElementById('window-chat');
-        win.style.display = 'flex';
-        // Перезагружаем фрейм, чтобы чат обновился
-        document.getElementById('chat-frame').src = document.getElementById('chat-frame').src;
+    function openApp(id) {
+        document.getElementById(id).style.display = 'flex';
+        // Если открываем чат, обновим фрейм
+        if(id === 'window-chat') {
+            const frame = document.getElementById('chat-frame');
+            frame.src = frame.src;
+        }
     }
 
-    function closeChat() {
-        document.getElementById('window-chat').style.display = 'none';
+    function closeApp(id) {
+        document.getElementById(id).style.display = 'none';
     }
 
-    function toggleFull() {
-        let win = document.getElementById('window-chat');
+    function toggleFull(id) {
+        let win = document.getElementById(id);
         if(win.style.width === "100%") {
-            win.style.width = "90%"; win.style.height = "80%"; win.style.top = "10%"; win.style.left = "5%";
+            win.style.width = id === 'window-chat' ? "85%" : "80%";
+            win.style.height = id === 'window-chat' ? "75%" : "70%";
+            win.style.top = id === 'window-chat' ? "10%" : "15%";
+            win.style.left = id === 'window-chat' ? "5%" : "10%";
         } else {
             win.style.width = "100%"; win.style.height = "100%"; win.style.top = "0"; win.style.left = "0";
         }
     }
 
-    // ЧАСЫ (Реальное время)
     function updateClock() {
         let now = new Date();
         let h = now.getHours();
@@ -154,3 +170,4 @@
 </script>
 </body>
 </html>
+
